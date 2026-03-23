@@ -1,0 +1,1 @@
+# Demosat Dictionary Interface
