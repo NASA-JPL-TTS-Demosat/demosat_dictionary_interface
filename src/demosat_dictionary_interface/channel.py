@@ -2,6 +2,7 @@ import pdb
 from pathlib import Path
 
 from tts_dictionary_interface.base import SemanticDictionary
+from tts_dictionary_interface.contracts import ChannelContract
 
 # ==========================================
 # 1. HELPER CLASSES
@@ -336,7 +337,7 @@ class JavaChannel(EhaChannel):
             'typedef': ('float | integer | enum | bool | var_string', False, EhaTypeDef)
         }
 
-class FswChannel(EhaChannel):
+class FswChannel(EhaChannel, ChannelContract):
     """
     Represents a standard channel originating from Flight Software (FSW).
 
@@ -384,6 +385,10 @@ class FswChannel(EhaChannel):
             # --- Backwards Compat Aliases ---
             'opscat': ('categories/ops_category', True, None),
             'module': ('categories/module', True, None),
+
+            # --- ChannelContract Aliases ---
+            'channel_id': ('@abbreviation', False, None),
+            'channel_name': ('@name', False, None),
         }
 
     @property
