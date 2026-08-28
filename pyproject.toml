@@ -23,6 +23,9 @@ Homepage = "https://github.com/NASA-JPL-TTS-Demosat/demosat_dictionary_interface
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.package-data]
+demosat_dictionary_interface = ["fprime/dictionaries/*/*.json"]
+
 [tool.setuptools_scm]
 version_scheme = "guess-next-dev"
 local_scheme = "no-local-version"

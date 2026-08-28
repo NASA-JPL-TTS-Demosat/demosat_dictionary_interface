@@ -1,0 +1,60 @@
+{
+  "metadata": {
+    "deploymentName": "DemoSat",
+    "projectVersion": "v1",
+    "frameworkVersion": "F Prime v3.4.0"
+  },
+  "channels": [
+    {
+      "name": "CDH.health.BATT_VOLTAGE",
+      "id": "0x1000",
+      "componentName": "CDH.health",
+      "type": {"name": "F32"},
+      "format": "{:.2f} V"
+    },
+    {
+      "name": "CDH.health.BATT_SOC",
+      "id": "0x1001",
+      "componentName": "CDH.health",
+      "type": {"name": "F32"},
+      "format": "{:.1f} %"
+    },
+    {
+      "name": "ADCS.starTracker.ST_LOCK_STATE",
+      "id": "0x2000",
+      "componentName": "ADCS.starTracker",
+      "type": {
+        "name": "ADCS_StarTrackerLockState",
+        "kind": "enum",
+        "enumeratedConstants": [
+          {"name": "LOCKED", "value": 0},
+          {"name": "LOST", "value": 1},
+          {"name": "SEARCHING", "value": 2}
+        ]
+      }
+    }
+  ],
+  "events": [
+    {
+      "name": "CDH.health.EPS_BATTERY_SOC_LOW",
+      "id": "0x3000",
+      "componentName": "CDH.health",
+      "severity": "WARNING_LO",
+      "formatString": "Battery State of Charge has dropped below %f percent."
+    },
+    {
+      "name": "ADCS.starTracker.ST_LOCK_LOST",
+      "id": "0x3001",
+      "componentName": "ADCS.starTracker",
+      "severity": "WARNING_LO",
+      "formatString": "Star Tracker %d lost solution."
+    },
+    {
+      "name": "CDH.commandDispatcher.OpCodeDispatched",
+      "id": "0x3002",
+      "componentName": "CDH.commandDispatcher",
+      "severity": "ACTIVITY_LO",
+      "formatString": "Command opcode 0x%04X dispatched successfully."
+    }
+  ]
+}
