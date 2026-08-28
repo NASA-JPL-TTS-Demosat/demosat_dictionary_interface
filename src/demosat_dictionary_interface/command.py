@@ -2,6 +2,7 @@ import pdb
 from pathlib import Path
 
 from tts_dictionary_interface.base import SemanticDictionary
+from tts_dictionary_interface.contracts import CommandContract, ArgumentContract
 
 # ==========================================
 # 1. ENUM DEFINITIONS
@@ -52,7 +53,7 @@ class CommandArgument(SemanticDictionary):
     """Base class for all command argument types."""
     pass
 
-class EnumArgument(CommandArgument):
+class EnumArgument(CommandArgument, ArgumentContract):
     """
     Represents a command argument constrained to a specific set of enumerated values.
 
@@ -67,6 +68,7 @@ class EnumArgument(CommandArgument):
     ATTR_XPATHS = {
         'name': ('@name', False, None),
         'bit_length': ('@bit_length', False, None),
+        'length': ('@bit_length', False, None),
         'enum_name': ('@enum_name', False, None),
         'description': ('description', True, None),
         'min': ('range_of_values/include/@min', False, None),
@@ -88,7 +90,7 @@ class EnumArgument(CommandArgument):
     def type(self):
         return f'ENUM.{self.enum_name}'
 
-class IntegerArgument(CommandArgument):
+class IntegerArgument(CommandArgument, ArgumentContract):
     """
     Represents a signed integer command argument.
 
@@ -103,6 +105,7 @@ class IntegerArgument(CommandArgument):
     ATTR_XPATHS = {
         'name': ('@name', False, None),
         'bit_length': ('@bit_length', False, None),
+        'length': ('@bit_length', False, None),
         'units': ('@units', False, None),
         'min': ('range_of_values/include/@min', False, None),
         'max': ('range_of_values/include/@max', False, None),
@@ -113,7 +116,7 @@ class IntegerArgument(CommandArgument):
     def type(self):
         return f'I{self.bit_length}'
 
-class UnsignedArgument(CommandArgument):
+class UnsignedArgument(CommandArgument, ArgumentContract):
     """
     Represents an unsigned integer command argument.
 
@@ -128,6 +131,7 @@ class UnsignedArgument(CommandArgument):
     ATTR_XPATHS = {
         'name': ('@name', False, None),
         'bit_length': ('@bit_length', False, None),
+        'length': ('@bit_length', False, None),
         'units': ('@units', False, None),
         'min': ('range_of_values/include/@min', False, None),
         'max': ('range_of_values/include/@max', False, None),
@@ -139,7 +143,7 @@ class UnsignedArgument(CommandArgument):
         return f'U{self.bit_length}'
 
 
-class FloatArgument(CommandArgument):
+class FloatArgument(CommandArgument, ArgumentContract):
     """
     Represents a floating point command argument.
 
@@ -154,6 +158,7 @@ class FloatArgument(CommandArgument):
     ATTR_XPATHS = {
         'name': ('@name', False, None),
         'bit_length': ('@bit_length', False, None),
+        'length': ('@bit_length', False, None),
         'units': ('@units', False, None),
         'min': ('range_of_values/include/@min', False, None),
         'max': ('range_of_values/include/@max', False, None),
@@ -165,7 +170,7 @@ class FloatArgument(CommandArgument):
         return f'F{self.bit_length}'
 
 
-class VarStringArgument(CommandArgument):
+class VarStringArgument(CommandArgument, ArgumentContract):
     """
     Represents a variable-length string argument.
 
@@ -180,6 +185,8 @@ class VarStringArgument(CommandArgument):
         'name': ('@name', False, None),
         'prefix_bit_length': ('@prefix_bit_length', False, None),
         'max_bit_length': ('@max_bit_length', False, None),
+        # ArgumentContract: a variable string's "length" is its max payload size.
+        'length': ('@max_bit_length', False, None),
         'regex': ('valid_regex', True, None),
         'description': ('description', True, None),
     }
@@ -189,7 +196,7 @@ class VarStringArgument(CommandArgument):
         return f'STRING{max_bit_length}'
 
 
-class RepeatArgument(CommandArgument):
+class RepeatArgument(CommandArgument, ArgumentContract):
     """
     Represents a nested list of arguments that can be repeated multiple times.
 
@@ -203,6 +210,9 @@ class RepeatArgument(CommandArgument):
     ATTR_XPATHS = {
         'name': ('@name', False, None),
         'prefix_bit_length': ('@prefix_bit_length', False, None),
+        # ArgumentContract: a repeat block's "length" is the bit length of its
+        # repetition-count prefix -- the only single scalar size concept it has.
+        'length': ('@prefix_bit_length', False, None),
         'min_reps': ('repeat/@min', False, None),
         'max_reps': ('repeat/@max', False, None),
         'description': ('description', True, None),
@@ -246,7 +256,7 @@ class ArgumentList(SemanticDictionary):
 # 3. COMMAND DEFINITIONS
 # ==========================================
 
-class HwCommand(SemanticDictionary):
+class HwCommand(SemanticDictionary, CommandContract):
     """
     Represents a hardware-level command definition.
 
@@ -266,7 +276,7 @@ class HwCommand(SemanticDictionary):
     def args(self):
         return []
 
-class FswCommand(SemanticDictionary):   
+class FswCommand(SemanticDictionary, CommandContract):   
     """
     Represents a Flight Software (FSW) command definition.
 
