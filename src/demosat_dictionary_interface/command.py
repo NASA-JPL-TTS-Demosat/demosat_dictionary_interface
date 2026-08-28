@@ -78,7 +78,7 @@ class EnumArgument(CommandArgument):
         """
         Resolves the ``enum_name`` string to the actual :class:`EnumTable` object.
         """
-        if not self.enum_name:
+        if not getattr(self, 'enum_name', None):
             return None
         query = f"//enum_definitions/enum_table[@name='{self.enum_name}']"
         matches = self.etree.xpath(query)
