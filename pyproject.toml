@@ -12,7 +12,7 @@ classifiers = [
   "License :: OSI Approved :: Unlicense",
 ]
 dependencies = [
-  "tts-dictionary-interface",
+  "tts-dictionary-interface>=0.4.0,<1.0.0",
   "tts-utilities>=0.2.2,<1.0.0"
 ]
 dynamic = ["version"]
