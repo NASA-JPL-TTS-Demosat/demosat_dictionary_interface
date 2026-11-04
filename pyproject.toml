@@ -40,3 +40,6 @@ requires = [
   "importlib_resources"
   ]
 build-backend = "setuptools.build_meta"
+
+[tool.tts-ctx]
+type = "adaptation"

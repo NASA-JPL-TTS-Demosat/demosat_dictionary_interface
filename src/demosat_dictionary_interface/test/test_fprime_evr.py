@@ -13,21 +13,21 @@ def fprime_dict():
 
 
 def test_event_lookup_by_name_and_id(fprime_dict):
-    by_name = fprime_dict.events['CDH.health.EPS_BATTERY_SOC_LOW']
-    by_id = fprime_dict.events['0x3000']
+    by_name = fprime_dict.events['EPS.EPS_BATTERY_SOC_LOW']
+    by_id = fprime_dict.events['0x20000001']
     assert isinstance(by_name, Event)
-    assert by_name.event_id == by_id.event_id == '0x3000'
+    assert by_name.event_id == by_id.event_id == '0x20000001'
 
 
 def test_event_satisfies_evr_contract(fprime_dict):
     """
     Verify Event satisfies EvrContract against the F-Prime fixture (#27).
     """
-    evr = fprime_dict.events['CDH.health.EPS_BATTERY_SOC_LOW']
+    evr = fprime_dict.events['EPS.EPS_BATTERY_SOC_LOW']
     assert isinstance(evr, EvrContract)
 
-    assert evr.name == 'CDH.health.EPS_BATTERY_SOC_LOW'
-    assert evr.severity == 'WARNING_LO'
+    assert evr.name == 'EPS.EPS_BATTERY_SOC_LOW'
+    assert evr.severity == 'WARNING_HI'
     assert evr.message == 'Battery State of Charge has dropped below %f percent.'
 
 
@@ -35,7 +35,7 @@ def test_event_no_argument_substitution(fprime_dict):
     """
     message must be the raw, unformatted template -- no substitution.
     """
-    evr = fprime_dict.events['ADCS.starTracker.ST_LOCK_LOST']
+    evr = fprime_dict.events['ADCS.ADCS_ST_LOCK_LOST']
     assert evr.message == 'Star Tracker %d lost solution.'
 
 
@@ -45,6 +45,6 @@ def test_event_not_found_raises_key_error(fprime_dict):
 
 
 def test_event_iteration_and_membership(fprime_dict):
-    assert 'CDH.health.EPS_BATTERY_SOC_LOW' in fprime_dict.events
-    assert len(fprime_dict.events) == 3
+    assert 'EPS.EPS_BATTERY_SOC_LOW' in fprime_dict.events
+    assert len(fprime_dict.events) == 40
     assert all(isinstance(e, Event) for e in fprime_dict.events)

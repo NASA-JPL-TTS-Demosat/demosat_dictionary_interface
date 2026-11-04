@@ -2,13 +2,18 @@ import pdb
 from pathlib import Path
 
 from tts_dictionary_interface.base import SemanticDictionary
-from tts_dictionary_interface.contracts import CommandContract, ArgumentContract
+from tts_dictionary_interface.contracts import (
+    ArgumentContract,
+    CommandContract,
+    EnumTableContract,
+    EnumValueContract,
+)
 
 # ==========================================
 # 1. ENUM DEFINITIONS
 # ==========================================
 
-class EnumValue(SemanticDictionary):
+class EnumValue(SemanticDictionary, EnumValueContract):
     """
     Represents a single key-value pair within an enumeration table.
 
@@ -23,7 +28,7 @@ class EnumValue(SemanticDictionary):
         'value': ('@numeric', False, None)
     }
 
-class EnumTable(SemanticDictionary):
+class EnumTable(SemanticDictionary, EnumTableContract):
     """
     Represents a full enumeration definition table.
 
@@ -36,6 +41,10 @@ class EnumTable(SemanticDictionary):
     ITEM_XPATHS = ['values/enum']
     ITEM_CLASSES = [EnumValue]
     ITEM_HUMAN_UNIQUE_IDS = ['symbol']
+
+    @property
+    def values(self):
+        return list(self)
 
 class EnumDefinitions(SemanticDictionary):
     """
@@ -193,7 +202,7 @@ class VarStringArgument(CommandArgument, ArgumentContract):
 
     @property
     def type(self):
-        return f'STRING{max_bit_length}'
+        return f'STRING{self.max_bit_length}'
 
 
 class RepeatArgument(CommandArgument, ArgumentContract):

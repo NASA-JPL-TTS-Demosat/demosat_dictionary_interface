@@ -13,22 +13,22 @@ def fprime_dict():
 
 
 def test_channel_lookup_by_name_and_id(fprime_dict):
-    by_name = fprime_dict.channels['CDH.health.BATT_VOLTAGE']
-    by_id = fprime_dict.channels['0x1000']
+    by_name = fprime_dict.channels['EPS.BATTERY_VOLTAGE']
+    by_id = fprime_dict.channels['0xA00B']
     assert isinstance(by_name, Channel)
-    assert by_name.channel_id == by_id.channel_id == '0x1000'
+    assert by_name.channel_id == by_id.channel_id == '0xA00B'
 
 
 def test_channel_satisfies_channel_contract(fprime_dict):
     """
     Verify Channel satisfies ChannelContract against the F-Prime fixture (#27).
     """
-    chan = fprime_dict.channels['CDH.health.BATT_VOLTAGE']
+    chan = fprime_dict.channels['EPS.BATTERY_VOLTAGE']
     assert isinstance(chan, ChannelContract)
 
-    assert chan.channel_id == '0x1000'
-    assert chan.channel_name == 'CDH.health.BATT_VOLTAGE'
-    assert chan.opscat == 'CDH.health'
+    assert chan.channel_id == '0xA00B'
+    assert chan.channel_name == 'EPS.BATTERY_VOLTAGE'
+    assert chan.opscat == 'EPS'
     assert chan.type == 'F32'
 
 
@@ -37,17 +37,20 @@ def test_channel_optional_attrs_are_none(fprime_dict):
     F-Prime has no native 'module' (distinct from opscat) or
     'measurement_id' concept -- both must resolve to None, not raise (#27).
     """
-    chan = fprime_dict.channels['CDH.health.BATT_VOLTAGE']
+    chan = fprime_dict.channels['EPS.BATTERY_VOLTAGE']
     assert chan.module is None
     assert chan.measurement_id is None
 
 
 def test_enum_channel(fprime_dict):
-    chan = fprime_dict.channels['ADCS.starTracker.ST_LOCK_STATE']
-    assert chan.type == 'ADCS_StarTrackerLockState'
+    chan = fprime_dict.channels['ADCS.ADCS_MODE']
+    assert chan.type == 'GUIDANCE_MODE'
     assert chan.type_kind == 'enum'
     names = [c['name'] for c in chan.enumerated_constants]
-    assert names == ['LOCKED', 'LOST', 'SEARCHING']
+    assert names == [
+        'IDLE', 'NADIR_POINT', 'SUN_POINT', 'MOON_POINT',
+        'INERTIAL_POINT', 'GROUND_TRACK',
+    ]
 
 
 def test_channel_not_found_raises_key_error(fprime_dict):
@@ -56,6 +59,6 @@ def test_channel_not_found_raises_key_error(fprime_dict):
 
 
 def test_channel_iteration_and_membership(fprime_dict):
-    assert 'CDH.health.BATT_VOLTAGE' in fprime_dict.channels
-    assert len(fprime_dict.channels) == 3
+    assert 'EPS.BATTERY_VOLTAGE' in fprime_dict.channels
+    assert len(fprime_dict.channels) == 24
     assert all(isinstance(c, Channel) for c in fprime_dict.channels)

@@ -1,6 +1,7 @@
 import json
 import os
 from pathlib import Path
+from typing import Optional
 
 try:
     from importlib.resources import files, as_file
@@ -63,3 +64,10 @@ class FprimeDictionary:
         self._data = data
         self.channels = ChannelCollection(data.get('channels', []))
         self.events = EventCollection(data.get('events', []))
+
+    @property
+    def version(self) -> Optional[str]:
+        """The dictionary's project version string, if declared in
+        ``metadata.projectVersion``. Returns ``None`` when absent."""
+        metadata = self._data.get('metadata') or {}
+        return metadata.get('projectVersion')

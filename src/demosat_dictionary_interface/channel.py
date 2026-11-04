@@ -2,13 +2,17 @@ import pdb
 from pathlib import Path
 
 from tts_dictionary_interface.base import SemanticDictionary
-from tts_dictionary_interface.contracts import ChannelContract
+from tts_dictionary_interface.contracts import (
+    ChannelContract,
+    EnumTableContract,
+    EnumValueContract,
+)
 
 # ==========================================
 # 1. HELPER CLASSES
 # ==========================================
 
-class EnumValue(SemanticDictionary):
+class EnumValue(SemanticDictionary, EnumValueContract):
     """
     Represents a single key-value pair in an enumeration.
 
@@ -23,7 +27,11 @@ class EnumValue(SemanticDictionary):
         'value': ('@value', False, None)
     }
 
-class EnumTable(SemanticDictionary):
+    @property
+    def value(self):
+        return self.numeric
+
+class EnumTable(SemanticDictionary, EnumTableContract):
     """
     Represents a full enumeration table definition.
 
@@ -36,6 +44,10 @@ class EnumTable(SemanticDictionary):
     ITEM_XPATHS = ['values/enum']
     ITEM_CLASSES = [EnumValue]
     ITEM_HUMAN_UNIQUE_IDS = ['symbol | numeric']
+
+    @property
+    def values(self):
+        return list(self)
 
 class AlgorithmParameter(SemanticDictionary):
     """

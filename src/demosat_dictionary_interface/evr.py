@@ -2,13 +2,18 @@ import pdb
 from pathlib import Path
 
 from tts_dictionary_interface.base import SemanticDictionary
-from tts_dictionary_interface.contracts import EvrContract
+from tts_dictionary_interface.contracts import (
+    EnumTableContract,
+    EnumValueContract,
+    EvrArgumentContract,
+    EvrContract,
+)
 
 # ==========================================
 # 1. ENUM DEFINITIONS
 # ==========================================
 
-class EnumValue(SemanticDictionary):
+class EnumValue(SemanticDictionary, EnumValueContract):
     """
     Represents a single key-value pair within an enumeration table.
 
@@ -22,7 +27,11 @@ class EnumValue(SemanticDictionary):
         'numeric': ('@numeric', False, None),
     }
 
-class EnumTable(SemanticDictionary):
+    @property
+    def value(self):
+        return self.numeric
+
+class EnumTable(SemanticDictionary, EnumTableContract):
     """
     Represents a full enumeration definition table.
 
@@ -36,6 +45,10 @@ class EnumTable(SemanticDictionary):
     ITEM_CLASSES = [EnumValue]
     ITEM_HUMAN_UNIQUE_IDS = ['symbol']
 
+    @property
+    def values(self):
+        return list(self)
+
 class EnumDefinitions(SemanticDictionary):
     """
     A namespaced container for all Enumeration Tables defined in the dictionary.
@@ -48,7 +61,7 @@ class EnumDefinitions(SemanticDictionary):
 # 2. EVR ARGUMENT DEFINITIONS
 # ==========================================
 
-class EvrArgument(SemanticDictionary):
+class EvrArgument(SemanticDictionary, EvrArgumentContract):
     """Base class for all EVR argument types."""
     ATTR_XPATHS = {
         'name': ('@name', False, None),
@@ -70,6 +83,14 @@ class IntegerEvrArgument(EvrArgument):
         'byte_length': ('@byte_length', False, None),
     }
 
+    @property
+    def length(self):
+        return self.byte_length
+
+    @property
+    def type(self):
+        return 'integer'
+
 class FloatEvrArgument(EvrArgument):
     """
     Represents a float-typed EVR argument (%f in the format message).
@@ -81,6 +102,14 @@ class FloatEvrArgument(EvrArgument):
         'name': ('@name', False, None),
         'byte_length': ('@byte_length', False, None),
     }
+
+    @property
+    def length(self):
+        return self.byte_length
+
+    @property
+    def type(self):
+        return 'float'
 
 class EnumEvrArgument(EvrArgument):
     """
@@ -96,6 +125,14 @@ class EnumEvrArgument(EvrArgument):
         'byte_length': ('@byte_length', False, None),
         'enum_name': ('@enum_name', False, None),
     }
+
+    @property
+    def length(self):
+        return self.byte_length
+
+    @property
+    def type(self):
+        return 'enum'
 
     @property
     def enum(self):
