@@ -16,6 +16,7 @@ from demosat_dictionary_interface.channel import (
     Derivation,
     FswChannel
 )
+from tts_dictionary_interface.contracts import ChannelContract
 
 # ==========================================
 # 1. FIXTURES
@@ -123,6 +124,26 @@ def test_standard_channel_attributes(channel_dict):
     # Conversions
     assert chan.raw_to_eng.eng_units == 'Volts'
     assert chan.raw_to_eng.algorithm['c1'].value == '0.015'
+
+def test_fsw_channel_satisfies_channel_contract(channel_dict):
+    """
+    Verify FswChannel satisfies ChannelContract against the real DemoSat
+    fixture: required attributes resolve, optional attributes at least
+    don't raise (#24).
+    """
+    chan = channel_dict['BATTERY_VOLTAGE']
+    assert isinstance(chan, ChannelContract)
+
+    assert chan.channel_id == 'EPS-0001'
+    assert chan.channel_name == 'BATTERY_VOLTAGE'
+    assert chan.opscat is not None
+    assert chan.type == 'float'
+
+    # module/measurement_id are optional per the contract; this fixture
+    # happens to define measurement_id, so just confirm access doesn't raise.
+    chan.module
+    chan.measurement_id
+
 
 def test_hardware_mapping(channel_dict):
     """

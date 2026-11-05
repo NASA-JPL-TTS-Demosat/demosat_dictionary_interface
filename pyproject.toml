@@ -12,7 +12,7 @@ classifiers = [
   "License :: OSI Approved :: Unlicense",
 ]
 dependencies = [
-  "tts-dictionary-interface",
+  "tts-dictionary-interface>=0.4.0,<1.0.0",
   "tts-utilities>=0.2.2,<1.0.0"
 ]
 dynamic = ["version"]
@@ -22,6 +22,9 @@ Homepage = "https://github.com/NASA-JPL-TTS-Demosat/demosat_dictionary_interface
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+demosat_dictionary_interface = ["fprime/dictionaries/*/*.json"]
 
 [tool.setuptools_scm]
 version_scheme = "guess-next-dev"
@@ -37,3 +40,6 @@ requires = [
   "importlib_resources"
   ]
 build-backend = "setuptools.build_meta"
+
+[tool.tts-ctx]
+type = "adaptation"

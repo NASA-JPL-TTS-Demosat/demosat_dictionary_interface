@@ -2,12 +2,17 @@ import pdb
 from pathlib import Path
 
 from tts_dictionary_interface.base import SemanticDictionary
+from tts_dictionary_interface.contracts import (
+    ChannelContract,
+    EnumTableContract,
+    EnumValueContract,
+)
 
 # ==========================================
 # 1. HELPER CLASSES
 # ==========================================
 
-class EnumValue(SemanticDictionary):
+class EnumValue(SemanticDictionary, EnumValueContract):
     """
     Represents a single key-value pair in an enumeration.
 
@@ -22,7 +27,11 @@ class EnumValue(SemanticDictionary):
         'value': ('@value', False, None)
     }
 
-class EnumTable(SemanticDictionary):
+    @property
+    def value(self):
+        return self.numeric
+
+class EnumTable(SemanticDictionary, EnumTableContract):
     """
     Represents a full enumeration table definition.
 
@@ -35,6 +44,10 @@ class EnumTable(SemanticDictionary):
     ITEM_XPATHS = ['values/enum']
     ITEM_CLASSES = [EnumValue]
     ITEM_HUMAN_UNIQUE_IDS = ['symbol | numeric']
+
+    @property
+    def values(self):
+        return list(self)
 
 class AlgorithmParameter(SemanticDictionary):
     """
@@ -226,7 +239,7 @@ class Derivation(SemanticDictionary):
         """
         A list of resolved :class:`FswChannel` objects for all parent_ids.
         """
-        if not self.parent_refs:
+        if not getattr(self, 'parent_refs', None):
             return []
             
         # Ensure iteration safety
@@ -273,7 +286,7 @@ class BitExtract(SemanticDictionary):
         """
         The resolved :class:`FswChannel` object that serves as the source.
         """
-        if not self.parent_id:
+        if not getattr(self, 'parent_id', None):
             return None
         # Try finding by abbreviation (standard for parent_id ref) then name
         query = f"//telemetry_definitions/telemetry[@abbreviation='{self.parent_id}' or @name='{self.parent_id}']"
@@ -291,7 +304,7 @@ class EhaChannel(SemanticDictionary):
         Maps the dictionary type (integer, unsigned, float) to the AMPCS equivalent
         (dn, eu, state, dnString).
         """
-        if not hasattr(self, 'type') or self.type is None:
+        if getattr(self, 'type', None) is None:
             return None
         mapping = {
             'enum': 'state', 'integer': 'dn', 'unsigned': 'dn',
@@ -336,7 +349,7 @@ class JavaChannel(EhaChannel):
             'typedef': ('float | integer | enum | bool | var_string', False, EhaTypeDef)
         }
 
-class FswChannel(EhaChannel):
+class FswChannel(EhaChannel, ChannelContract):
     """
     Represents a standard channel originating from Flight Software (FSW).
 
@@ -384,6 +397,10 @@ class FswChannel(EhaChannel):
             # --- Backwards Compat Aliases ---
             'opscat': ('categories/ops_category', True, None),
             'module': ('categories/module', True, None),
+
+            # --- ChannelContract Aliases ---
+            'channel_id': ('@abbreviation', False, None),
+            'channel_name': ('@name', False, None),
         }
 
     @property
@@ -391,7 +408,7 @@ class FswChannel(EhaChannel):
         """
         The resolved :class:`EnumTable` object referenced by ``enum_name``.
         """
-        if not self.enum_name:
+        if not getattr(self, 'enum_name', None):
             return None
         query = f"//enum_definitions/enum_table[@name='{self.enum_name}']"
         matches = self.etree.xpath(query)
@@ -402,7 +419,7 @@ class FswChannel(EhaChannel):
         """
         The resolved :class:`Derivation` object referenced by ``derivation_ref_id``.
         """
-        if not self.derivation_ref_id:
+        if not getattr(self, 'derivation_ref_id', None):
             return None
         query = f"//derivation_definitions/derivation[@derivation_id='{self.derivation_ref_id}']"
         matches = self.etree.xpath(query)

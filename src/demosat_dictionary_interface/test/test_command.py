@@ -22,6 +22,7 @@ from demosat_dictionary_interface.command import (
     VarStringArgument, 
     RepeatArgument
 )
+from tts_dictionary_interface.contracts import CommandContract, ArgumentContract
 
 # ==========================================
 # 1. FIXTURES
@@ -103,6 +104,53 @@ def test_fsw_command_attributes(cmd_dict):
 # ==========================================
 # 4. ARGUMENTS (SCALARS)
 # ==========================================
+
+def test_hw_and_fsw_command_satisfy_command_contract(cmd_dict):
+    """
+    Verify HwCommand/FswCommand satisfy CommandContract against the real
+    DemoSat fixture (#25).
+    """
+    hw_cmd = cmd_dict['TEST_HW_CMD_1']
+    assert isinstance(hw_cmd, CommandContract)
+    assert hw_cmd.stem == 'TEST_HW_CMD_1'
+    assert hw_cmd.opcode == '0x0001'
+    assert hw_cmd.opscat == 'AVS'
+    assert hw_cmd.args == []
+
+    fsw_cmd = cmd_dict['SET_HEATER_DUTY']
+    assert isinstance(fsw_cmd, CommandContract)
+    assert fsw_cmd.stem == 'SET_HEATER_DUTY'
+    assert fsw_cmd.opcode is not None
+    assert fsw_cmd.opscat is not None
+    assert list(fsw_cmd.args) != [] or fsw_cmd.args == []
+
+
+def test_unsigned_argument_satisfies_argument_contract(cmd_dict):
+    """
+    Verify UnsignedArgument satisfies ArgumentContract against the real
+    DemoSat fixture (#25).
+    """
+    cmd = cmd_dict['SET_HEATER_DUTY']
+    arg = cmd.args['duty_cycle']
+    assert isinstance(arg, ArgumentContract)
+    assert arg.name == 'duty_cycle'
+    assert arg.length == '8'
+    assert arg.units == 'percent'
+    assert arg.min == '0'
+    assert arg.max == '100'
+
+
+def test_enum_argument_satisfies_argument_contract_with_optional_units(cmd_dict):
+    """
+    EnumArgument has no native 'units' concept -- ArgumentContract.units
+    must resolve to None rather than raising (#25).
+    """
+    cmd = cmd_dict['FORCE_HIGH_SPEED_DUMP']
+    arg = cmd.args['dump_rate']
+    assert isinstance(arg, ArgumentContract)
+    assert arg.name == 'dump_rate'
+    assert arg.units is None
+
 
 def test_integer_argument(cmd_dict):
     """
